@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Imbas Kehadiran Pelajar</title>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    #reader {
+      width: 100%;
+      max-width: 400px;
+      margin: auto;
+    }
+    .btn {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Imbas QR Kehadiran Pelajar</h2>
+  <div id="reader"></div>
+  <p id="status"></p>
+
+  <script>
+    const AUTH_KEY = "PENGAJAR123"; // Gantikan dengan authKey cikgu
+    const BASE_URL = "https://script.google.com/macros/s/AKfycbwdcMJcCjHQf_dkpiWu_dk6Gf8rkFBMYw_tkk4VRcI1MOAokk-H4IR8DyIFxpr03yOT/exec";
+
+    function onScanSuccess(decodedText, decodedResult) {
+      document.getElementById("status").innerText = `Kod dibaca: ${decodedText}`;
+
+      // Pisahkan parameter asal
+      let url = new URL(decodedText);
+      let params = new URLSearchParams(url.search);
+      let id = params.get("id");
+      let slot = params.get("slot");
+
+      if (id && slot) {
+        let finalUrl = `${BASE_URL}?id=${encodeURIComponent(id)}&slot=${encodeURIComponent(slot)}&authKey=${AUTH_KEY}`;
+        window.location.href = finalUrl;
+      } else {
+        alert("QR tidak sah. Sila cuba lagi.");
+      }
+    }
+
+    function onScanFailure(error) {
+      // optional: log error atau abaikan
+    }
+
+    const html5QrCode = new Html5Qrcode("reader");
+    const config = { fps: 10, qrbox: 250 };
+
+    Html5Qrcode.getCameras().then(cameras => {
+      if (cameras && cameras.length) {
+        html5QrCode.start(
+          cameras[0].id,
+          config,
+          onScanSuccess,
+          onScanFailure
+        );
+      } else {
+        document.getElementById("status").innerText = "Tiada kamera dijumpai.";
+      }
+    }).catch(err => {
+      document.getElementById("status").innerText = `Ralat kamera: ${err}`;
+    });
+  </script>
+</body>
+</html>
