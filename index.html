@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Imbas Kehadiran Pelajar</title>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+    #reader { width: 100%; max-width: 400px; margin: auto; }
+    #status { margin-top: 15px; font-size: 14px; color: #333; }
+  </style>
+</head>
+<body>
+  <h2>Imbas QR Kehadiran Pelajar</h2>
+  <div id="reader"></div>
+  <p id="status">Sedia imbas...</p>
+
+  <script>
+    const AUTH_KEY = "PENGAJAR123";  // 📌 Ganti ini dengan authKey anda
+    const BASE_URL = "https://script.google.com/macros/s/AKfycbwdcMJcCjHQf_dkpiWu_dk6Gf8rkFBMYw_tkk4VRcI1MOAokk-H4IR8DyIFxpr03yOT/exec"; // Ganti dengan URL WebApp anda
+
+    function onScanSuccess(decodedText) {
+      document.getElementById("status").innerText = `Kod dibaca: ${decodedText}`;
+
+      let params = new URLSearchParams(decodedText.split('?')[1] || "");
+      const id = params.get("id");
+      const slot = params.get("slot");
+
+      if (id && slot) {
+        const finalUrl = `${https://script.google.com/macros/s/AKfycbxk-ddhi0q4yLurn9JTjvbI8niC6bIX5xwNhSgGJfGlRlI6UUamxnFoGWmx7zJfn2kBXg/exec}?id=${encodeURIComponent(id)}&slot=${encodeURIComponent(slot)}&authKey=${encodeURIComponent(AUTH_KEY)}`;
+        document.getElementById("status").innerText = "Imbas berjaya. Menghantar data...";
+        window.location.href = finalUrl;
+      } else {
+        alert("QR tidak sah. Pastikan ia mengandungi id dan slot.");
+      }
+    }
+
+    function onScanFailure(error) {
+      // abaikan
+    }
+
+    Html5Qrcode.getCameras().then(cameras => {
+      if (cameras.length) {
+        new Html5Qrcode("reader").start(
+          cameras[0].id,
+          { fps: 10, qrbox: 250 },
+          onScanSuccess,
+          onScanFailure
+        ).catch(err => {
+          document.getElementById("status").innerText = "Ralat semasa mulakan kamera: " + err;
+        });
+      } else {
+        document.getElementById("status").innerText = "Tiada kamera dijumpai.";
+      }
+    }).catch(err => {
+      document.getElementById("status").innerText = "Ralat dapatkan kamera: " + err;
+    });
+  </script>
+</body>
+</html>
